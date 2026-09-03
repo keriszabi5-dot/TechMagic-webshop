@@ -2,7 +2,6 @@
 require 'db.php';
 session_start();
 
-
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -10,6 +9,7 @@ if (isset($_SESSION['user_id'])) {
 
 $error = '';
 $error_type = 'danger'; 
+$login_input = ''; // Változó inicializálása a hiba elkerülése érdekében
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login_input = trim($_POST['username']); 
@@ -17,17 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($login_input) && !empty($pass)) {
         try {
-            
             $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
             $stmt->execute([$login_input, $login_input]);
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-          
             if ($userData && password_verify($pass, $userData['password'])) {
-                
-           
                 if ((int)$userData['status'] === 1) {
-               
                     $_SESSION['user_id'] = $userData['id'];
                     $_SESSION['username'] = $userData['username'];
                     $_SESSION['email'] = $userData['email'];
@@ -35,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     header("Location: index.php");
                     exit;
                 } else {
-                 
                     $error = "A fiókod még nincs aktiválva! Kérjük, ellenőrizd az e-mail fiókodat a megerősítő linkért.";
                     $error_type = 'warning'; 
                 }
@@ -66,16 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-header">
-                
                 <div class="auth-logo" style="text-align: center; margin-bottom: 20px;">
                     <img src="images/logo.png" alt="TechMagic Logo" style="max-width: 150px; height: auto;">
                 </div>
-                
                 <h2 class="auth-title">Üdvözlünk a TechMagic oldalon!</h2>
                 <p class="auth-subtitle">Lépj be a fiókodba a vásárláshoz</p>
             </div>
 
-         
             <?php if ($error): ?>
                 <div class="alert alert-<?= $error_type ?>"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
@@ -83,18 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="POST">
                 <div class="form-group">
                     <label class="form-label">Felhasználónév vagy E-mail cím</label>
-                    <input type="text" name="username" value="<?= htmlspecialchars($login_input ?? '') ?>" required class="form-input" placeholder="felhasznalonev vagy@email.com">
+                    <input type="text" name="username" value="<?= htmlspecialchars($login_input) ?>" required class="form-input" placeholder="felhasznalonev vagy@email.com">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jelszó</label>
-                    <input type="password" name="password" required class="form-input" placeholder="••••••••">
+                    <!-- KLIENSOLDALI ELLENŐRZÉS: minlength="6" beállítva a bejelentkezésnél is -->
+                    <input type="password" name="password" minlength="6" required class="form-input" placeholder="••••••••">
                 </div>
                 <button type="submit" class="submit-btn">Bejelentkezés</button>
             </form>
 
             <div style="margin-top: 12px;">
                 <a href="index.php" class="submit-btn" style="display: block; text-align: center; text-decoration: none; background: #6b7280; color: white;">
-                    Tovablépés vendégként
+                    Tovovábblépés vendégként
                 </a>
             </div>
 
