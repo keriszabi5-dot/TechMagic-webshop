@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Érvénytelen e-mail cím formátum.";
     } elseif (strlen($pass) < 6) {
-        // SZERVEROLDALI ELLENŐRZÉS: Legalább 6 karakter (több mint 5)
         $message = "A jelszónak legalább 6 karakterből kell állnia.";
     } elseif ($pass !== $pass_confirm) {
         $message = "A két jelszó nem egyezik meg.";
@@ -92,12 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jelszó (minimum 6 karakter)</label>
-                    <!-- KLIENSOLDALI ELLENŐRZÉS: minlength="6" -->
                     <input type="password" name="password" minlength="6" required class="form-input" placeholder="••••••••">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jelszó újra</label>
-                    <!-- KLIENSOLDALI ELLENŐRZÉS: minlength="6" -->
                     <input type="password" name="password_confirm" minlength="6" required class="form-input" placeholder="••••••••">
                 </div>
                 <button type="submit" class="submit-btn">Regisztráció</button>

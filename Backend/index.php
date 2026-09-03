@@ -2,16 +2,12 @@
 require 'db.php';
 session_start();
 
-
-
 if (!isset($_SESSION['cart'])) { $_SESSION['cart'] = []; }
-
 
 $active_tab = $_GET['tab'] ?? 'home';
 if (!in_array($active_tab, ['home', 'products', 'contact'])) {
     $active_tab = 'home';
 }
-
 
 if (isset($_GET['add'])) {
     $product_id = (int)$_GET['add'];
@@ -24,7 +20,6 @@ if (isset($_GET['add'])) {
 $cart_count = array_sum($_SESSION['cart']);
 $products = $pdo->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
 
-
 $weekly_offers = array_slice($products, 0, 2);
 ?>
 <!DOCTYPE html>
@@ -32,7 +27,7 @@ $weekly_offers = array_slice($products, 0, 2);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechBolt</title>
+    <title>TechBolt - TechMagic</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -51,35 +46,37 @@ $weekly_offers = array_slice($products, 0, 2);
                 </div>
             </div>
             
-       <div class="nav-menu">
-    <?php if (isset($_SESSION['username'])): ?>
-        <span class="welcome-text">Szia, <b><?= htmlspecialchars($_SESSION['username']) ?></b></span>
-    <?php else: ?>
-        <span class="welcome-text">Szia, <b>Vendég</b></span>
-    <?php endif; ?>
-    
-    <a href="cart.php" class="cart-btn">
-        <svg class="cart-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"/>
-        </svg>
-        <span class="cart-count"><?= $cart_count ?></span>
-    </a>
+            <div class="nav-menu">
+                <?php if (isset($_SESSION['username'])): ?>
+                    <span class="welcome-text">Szia, <b><?= htmlspecialchars($_SESSION['username']) ?></b></span>
+                    
+                    <?php if (isset($_SESSION['is_admin']) && (int)$_SESSION['is_admin'] === 1): ?>
+                        <a href="admin.php" style="color: #6366f1; font-weight: 700; text-decoration: none; margin-right: 8px; border: 1px solid #6366f1; padding: 4px 8px; border-radius: 6px; background: rgba(99, 102, 241, 0.05);">🛠️ Admin panel</a>
+                    <?php endif; ?>
+                    
+                <?php else: ?>
+                    <span class="welcome-text">Szia, <b>Vendég</b></span>
+                <?php endif; ?>
+                
+                <a href="cart.php" class="cart-btn">
+                    <svg class="cart-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"/>
+                    </svg>
+                    <span class="cart-count"><?= $cart_count ?></span>
+                </a>
 
-    <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="logout.php" class="logout-btn">Kilépés</a>
-    <?php else: ?>
-    
-        <a href="register.php" class="logout-btn" style="background: #10b981; color: white; margin-right: 8px;">Regisztráció</a>
-        <a href="login.php" class="logout-btn" style="background: #6366f1; color: white;">Belépés</a>
-    <?php endif; ?>
-</div>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="logout.php" class="logout-btn">Kilépés</a>
+                <?php else: ?>
+                    <a href="register.php" class="logout-btn" style="background: #10b981; color: white; margin-right: 8px;">Regisztráció</a>
+                    <a href="login.php" class="logout-btn" style="background: #6366f1; color: white;">Belépés</a>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
   
     <main class="main-content">
-   
         <div id="home" class="tab-content <?= $active_tab === 'home' ? 'active' : '' ?>">
-            
             <div style="background: #ffffff; border: 1px solid #f3f4f6; border-radius: 12px; padding: 32px; text-align: center; max-width: 600px; margin: 0 auto 32px auto;">
                 <h2 style="font-size: 25px; font-weight: 900; margin-bottom: 8px; color: #111827;">Üdvözlünk a TechMagic oldalon!</h2>
                 <p style="font-size: 18px; color: #6b7280; line-height: 1.6; margin-bottom: 20px;">
@@ -88,7 +85,6 @@ $weekly_offers = array_slice($products, 0, 2);
                 <a href="index.php?tab=products" class="buy-btn" style="padding: 10px 20px; font-size: 20px;" onclick="switchTab(event, 'products')">Termékek megtekintése</a>
             </div>
 
-            
             <div style="max-width: 800px; margin: 0 auto; background: #ffffff; border: 1px solid #f3f4f6; border-radius: 12px; padding: 24px;">
                 <h2 style="font-size: 35px; font-weight: 900; text-align: center; margin-bottom: 24px; color: #111827; position: relative; padding-bottom: 8px;">
                     🔥 Heti ajánlataink
@@ -125,6 +121,14 @@ $weekly_offers = array_slice($products, 0, 2);
                                     </div>
                                     <h3 class="product-name" style="color: #6366f1;"><?= htmlspecialchars($product['name']) ?></h3>
                                     <p class="product-desc"><?= htmlspecialchars($product['description']) ?></p>
+                                    
+                                    <p style="font-size: 12px; margin-bottom: 8px;">
+                                        <?php if ((int)$product['stock'] > 0): ?>
+                                            <span style="color: #10b981; font-weight: 600;">Készleten: <?= (int)$product['stock'] ?> db</span>
+                                        <?php else: ?>
+                                            <span style="color: #ef4444; font-weight: 600;">Nincs raktáron</span>
+                                        <?php endif; ?>
+                                    </p>
                                 </div>
                                 <div class="product-footer" style="margin-top: 12px;">
                                     <span class="product-price" style="font-size: 20px; font-weight: 800; color: #10b981;">$<?= number_format($product['price'], 2) ?></span>
@@ -139,7 +143,6 @@ $weekly_offers = array_slice($products, 0, 2);
             </div>
         </div>
 
-    
         <div id="products" class="tab-content <?= $active_tab === 'products' ? 'active' : '' ?>">
             <h2 style="font-size: 50px; font-weight: 900; margin-bottom: 16px; color: #374151;">Kiemelt termékeink</h2>
             <div class="grid">
@@ -170,17 +173,29 @@ $weekly_offers = array_slice($products, 0, 2);
                             </div>
                             <h3 class="product-name"><?= htmlspecialchars($product['name']) ?></h3>
                             <p class="product-desc"><?= htmlspecialchars($product['description']) ?></p>
+                            
+                            <p style="font-size: 12px; margin-bottom: 8px;">
+                                <?php if ((int)$product['stock'] > 0): ?>
+                                    <span style="color: #10b981; font-weight: 600;">Készleten: <?= (int)$product['stock'] ?> db</span>
+                                <?php else: ?>
+                                    <span style="color: #ef4444; font-weight: 600;">Átmenetileg nem elérhető</span>
+                                <?php endif; ?>
+                            </p>
                         </div>
                         <div class="product-footer" style="margin-top: 12px;">
                             <span class="product-price">$<?= number_format($product['price'], 2) ?></span>
-                            <a href="index.php?add=<?= $product['id'] ?>&tab=products" class="buy-btn add-to-cart-btn">+ Kosárba</a>
+                            
+                            <?php if ((int)$product['stock'] > 0): ?>
+                                <a href="index.php?add=<?= $product['id'] ?>&tab=products" class="buy-btn add-to-cart-btn">+ Kosárba</a>
+                            <?php else: ?>
+                                <span style="background: #f3f4f6; color: #9ca3af; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 700;">Elfogyott</span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
-     
         <div id="contact" class="tab-content <?= $active_tab === 'contact' ? 'active' : '' ?>">
             <div class="contact-card">
                 <h3 class="contact-title">Kapcsolat & Elérhetőség</h3>

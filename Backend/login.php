@@ -9,7 +9,7 @@ if (isset($_SESSION['user_id'])) {
 
 $error = '';
 $error_type = 'danger'; 
-$login_input = ''; // Változó inicializálása a hiba elkerülése érdekében
+$login_input = ''; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login_input = trim($_POST['username']); 
@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_id'] = $userData['id'];
                     $_SESSION['username'] = $userData['username'];
                     $_SESSION['email'] = $userData['email'];
+                    $_SESSION['is_admin'] = (int)$userData['is_admin']; 
 
                     header("Location: index.php");
                     exit;
@@ -78,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="form-group">
                     <label class="form-label">Jelszó</label>
-                    <!-- KLIENSOLDALI ELLENŐRZÉS: minlength="6" beállítva a bejelentkezésnél is -->
                     <input type="password" name="password" minlength="6" required class="form-input" placeholder="••••••••">
                 </div>
                 <button type="submit" class="submit-btn">Bejelentkezés</button>
